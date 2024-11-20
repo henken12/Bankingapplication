@@ -1,7 +1,9 @@
 package com.bank.bankingapplication.controller;
 
 import com.bank.bankingapplication.model.Account;
+import com.bank.bankingapplication.model.AccountDto;
 import com.bank.bankingapplication.service.AccountService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +16,7 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
     @PostMapping
-    public ResponseEntity<Account> createAccount(@RequestBody Account account) {
+    public ResponseEntity<Account> createAccount(@RequestBody @Valid AccountDto account) {
         Account createdAccount = accountService.createAccount(account);
         return ResponseEntity.ok(createdAccount);
     }
@@ -27,9 +29,15 @@ public class AccountController {
         return ResponseEntity.notFound().build();
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Account> updateAccount(@PathVariable long id, @RequestBody Account accountDetails) {
-        accountDetails.setAccountId(id);
-        Account updatedAccount = accountService.updateAccount(accountDetails);
+    public ResponseEntity<Account> updateAccount(@PathVariable long id, @RequestBody AccountDto accountDto) {
+
+        Account newAccount= new Account();
+        newAccount.setAccountId(id);
+        newAccount.setBalance(accountDto.getBalance());
+        newAccount.setAccountType(accountDto.getAccountType());
+
+
+        Account updatedAccount = accountService.updateAccount(newAccount);
         return ResponseEntity.ok(updatedAccount);
     }
     @DeleteMapping("/{id}")
@@ -42,4 +50,22 @@ public class AccountController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Account> getAccountByEmail(@PathVariable String email) {
+        Account account = accountService.getAccountEmail(email);
+        if (account != null) {
+            return ResponseEntity.ok(account);
+        }
+        return ResponseEntity.notFound().build();
+    }
+    @GetMapping("/accountNumber/{accountNumber}")
+    public ResponseEntity<Account> getAccountByNumber(@PathVariable String accountNumber) {
+        Account account = accountService.getAccountNumber(accountNumber);
+        if (account != null) {
+            return ResponseEntity.ok(account);
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
+
+
