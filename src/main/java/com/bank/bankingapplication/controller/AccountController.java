@@ -11,15 +11,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/accounts")
+@RequestMapping("/api/account")
 public class AccountController {
     @Autowired
     private AccountService accountService;
+
     @PostMapping
     public ResponseEntity<Account> createAccount(@RequestBody @Valid AccountDto account) {
         Account createdAccount = accountService.createAccount(account);
         return ResponseEntity.ok(createdAccount);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<Account> getAccountDetails(@PathVariable long id) {
         Optional<Account> accountDetails = accountService.getAccountDetails(id);
@@ -28,23 +30,28 @@ public class AccountController {
         }
         return ResponseEntity.notFound().build();
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<Account> updateAccount(@PathVariable long id, @RequestBody AccountDto accountDto) {
 
-        // Set the account ID in the DTO
-        accountDto.setAccountId(id);
+        Account newAccount= new Account();
+        newAccount.setAccountId(id);
+        newAccount.setBalance(accountDto.getBalance());
+        newAccount.setAccountType(accountDto.getAccountType());
 
-        // Call the service layer to update the account
-        Account updatedAccount = accountService.updateAccount(accountDto);
+
+        Account updatedAccount = accountService.updateAccount(newAccount);
         return ResponseEntity.ok(updatedAccount);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAccount(@PathVariable long id) {
-        try {
+        Optional<Account> accountDetails = accountService.getAccountDetails(id);
+        if (accountDetails.isPresent()) {
             accountService.deleteAccount(id);
-            return ResponseEntity.noContent().build(); // Return 204 No Content if successful
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build(); // Return 404 Not Found if the account does not exist
+            return ResponseEntity.noContent().build();
+        }else{
+            return ResponseEntity.notFound().build();
         }
     }
     @GetMapping("/email/{email}")
