@@ -35,5 +35,22 @@ public class RestExceptionHandler {
 
 
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<List<ResponseData>> handleValidationExceptions2(MethodArgumentNotValidException ex) {
+        List<ResponseData> errors = ex.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(error -> {
+                    String field = ((FieldError) error).getField();
+                    String message = error.getDefaultMessage();
+                    return new ResponseData(field, message);
+                })
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+
+
 
 }

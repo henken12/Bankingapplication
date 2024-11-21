@@ -34,11 +34,8 @@ public class AccountController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ResponseData> updateAccount(@PathVariable long id, @RequestBody AccountUpdateDto accountDto) {
-
-        Account newAccount = new Account();
-        newAccount.setAccountId(id);
-        newAccount.setBalance(accountDto.getBalance());
-        Account updatedAccount = accountService.updateAccount(newAccount);
+        accountDto.setAccountId(id);
+        Account updatedAccount = accountService.updateAccount(accountDto);
         return ResponseEntity.ok(new ResponseData("0", "Success", updatedAccount));
     }
 

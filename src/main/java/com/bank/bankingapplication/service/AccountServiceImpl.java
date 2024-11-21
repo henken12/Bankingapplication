@@ -2,6 +2,7 @@ package com.bank.bankingapplication.service;
 
 import com.bank.bankingapplication.model.Account;
 import com.bank.bankingapplication.model.AccountDto;
+import com.bank.bankingapplication.model.AccountUpdateDto;
 import com.bank.bankingapplication.model.response.ResponseData;
 import com.bank.bankingapplication.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account updateAccount(AccountDto accountDto) {
+    public Account updateAccount(AccountUpdateDto accountDto) {
         // Find the existing account by ID
         Optional<Account> existingAccountOpt = accountRepository.findById(accountDto.getAccountId());
 
@@ -51,7 +52,27 @@ public class AccountServiceImpl implements AccountService {
 
             // Update fields from DTO
             existingAccount.setAccountNumber(accountDto.getAccountNumber());
-            existingAccount.setAccountType(accountDto.getAccountType());
+            existingAccount.setBalance(accountDto.getBalance());
+            existingAccount.setStatus(accountDto.getStatus());
+            existingAccount.setEmail(accountDto.getEmail());
+
+            // Save the updated account
+            return accountRepository.save(existingAccount);
+        } else {
+            throw new IllegalArgumentException("Account not found with ID: " + accountDto.getAccountId());
+        }
+    }
+
+
+    public Account updateAccount(Account accountDto) {
+        // Find the existing account by ID
+        Optional<Account> existingAccountOpt = accountRepository.findById(accountDto.getAccountId());
+
+        if (existingAccountOpt.isPresent()) {
+            Account existingAccount = existingAccountOpt.get();
+
+            // Update fields from DTO
+            existingAccount.setAccountNumber(accountDto.getAccountNumber());
             existingAccount.setBalance(accountDto.getBalance());
             existingAccount.setStatus(accountDto.getStatus());
             existingAccount.setEmail(accountDto.getEmail());
