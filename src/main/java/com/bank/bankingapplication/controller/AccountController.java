@@ -31,23 +31,20 @@ public class AccountController {
     @PutMapping("/{id}")
     public ResponseEntity<Account> updateAccount(@PathVariable long id, @RequestBody AccountDto accountDto) {
 
-        Account newAccount= new Account();
-        newAccount.setAccountId(id);
-        newAccount.setBalance(accountDto.getBalance());
-        newAccount.setAccountType(accountDto.getAccountType());
+        // Set the account ID in the DTO
+        accountDto.setAccountId(id);
 
-
-        Account updatedAccount = accountService.updateAccount(newAccount);
+        // Call the service layer to update the account
+        Account updatedAccount = accountService.updateAccount(accountDto);
         return ResponseEntity.ok(updatedAccount);
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAccount(@PathVariable long id) {
-        Optional<Account> accountDetails = accountService.getAccountDetails(id);
-        if (accountDetails.isPresent()) {
+        try {
             accountService.deleteAccount(id);
-            return ResponseEntity.noContent().build();
-        }else{
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build(); // Return 204 No Content if successful
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build(); // Return 404 Not Found if the account does not exist
         }
     }
     @GetMapping("/email/{email}")
