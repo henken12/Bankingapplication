@@ -26,6 +26,8 @@ public class AccountServiceImpl implements AccountService {
         newAccount.setAccountNumber(accountDto.getAccountNumber());
         newAccount.setBalance(accountDto.getBalance());
         newAccount.setAccountType(accountDto.getAccountType());
+        newAccount.setStatus(accountDto.getStatus());
+        newAccount.setEmail(accountDto.getEmail());
 
         // Save the new account if it doesn't exist
         return accountRepository.save(newAccount);
@@ -37,14 +39,38 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account updateAccount(Account account) {
-        return accountRepository.save(account);
+    public Account updateAccount(AccountDto accountDto) {
+        // Find the existing account by ID
+        Optional<Account> existingAccountOpt = accountRepository.findById(accountDto.getAccountId());
+
+        if (existingAccountOpt.isPresent()) {
+            Account existingAccount = existingAccountOpt.get();
+
+            // Update fields from DTO
+            existingAccount.setAccountNumber(accountDto.getAccountNumber());
+            existingAccount.setAccountType(accountDto.getAccountType());
+            existingAccount.setBalance(accountDto.getBalance());
+            existingAccount.setStatus(accountDto.getStatus());
+            existingAccount.setEmail(accountDto.getEmail());
+
+            // Save the updated account
+            return accountRepository.save(existingAccount);
+        } else {
+            throw new IllegalArgumentException("Account not found with ID: " + accountDto.getAccountId());
+        }
     }
 
     @Override
     public void deleteAccount(Long accountId) {
-     accountRepository.deleteById(accountId);
+        // Check if the account exists before attempting to delete
+        Optional<Account> account = accountRepository.findById(accountId);
+        if (account.isPresent()) {
+            accountRepository.deleteById(accountId);
+        } else {
+            throw new IllegalArgumentException("Account with ID " + accountId + " does not exist.");
+        }
     }
+
 
     @Override
     public Account getAccountEmail(String email) {

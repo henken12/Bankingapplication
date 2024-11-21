@@ -22,8 +22,7 @@ public class AccountDto {
     @NotBlank(message = "Status is required")
     @Pattern(regexp = "ACTIVE|INACTIVE|CLOSED", message = "Status must be ACTIVE, INACTIVE, or CLOSED")
     private String status;
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
+    @Column(name="email", unique=true, nullable=false)
     private String email;
 
 
