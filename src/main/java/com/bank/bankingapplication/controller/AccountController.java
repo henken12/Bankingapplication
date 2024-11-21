@@ -2,6 +2,8 @@ package com.bank.bankingapplication.controller;
 
 import com.bank.bankingapplication.model.Account;
 import com.bank.bankingapplication.model.AccountDto;
+import com.bank.bankingapplication.model.AccountUpdateDto;
+import com.bank.bankingapplication.model.response.ResponseData;
 import com.bank.bankingapplication.service.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,31 +19,27 @@ public class AccountController {
     private AccountService accountService;
 
     @PostMapping
-    public ResponseEntity<Account> createAccount(@RequestBody @Valid AccountDto account) {
-        Account createdAccount = accountService.createAccount(account);
-        return ResponseEntity.ok(createdAccount);
+    public ResponseEntity<ResponseData> createAccount(@RequestBody @Valid AccountDto account) {
+        return ResponseEntity.ok(accountService.createAccount(account));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Account> getAccountDetails(@PathVariable long id) {
+    public ResponseEntity<ResponseData> getAccountDetails(@PathVariable long id) {
         Optional<Account> accountDetails = accountService.getAccountDetails(id);
         if (accountDetails.isPresent()) {
-            return ResponseEntity.ok(accountDetails.get());
+            return ResponseEntity.ok(new ResponseData("0", "Success", accountDetails.get()));
         }
         return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Account> updateAccount(@PathVariable long id, @RequestBody AccountDto accountDto) {
+    public ResponseEntity<ResponseData> updateAccount(@PathVariable long id, @RequestBody AccountUpdateDto accountDto) {
 
-        Account newAccount= new Account();
+        Account newAccount = new Account();
         newAccount.setAccountId(id);
         newAccount.setBalance(accountDto.getBalance());
-        newAccount.setAccountType(accountDto.getAccountType());
-
-
         Account updatedAccount = accountService.updateAccount(newAccount);
-        return ResponseEntity.ok(updatedAccount);
+        return ResponseEntity.ok(new ResponseData("0", "Success", updatedAccount));
     }
 
     @DeleteMapping("/{id}")
@@ -54,19 +52,22 @@ public class AccountController {
             return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping("/email/{email}")
-    public ResponseEntity<Account> getAccountByEmail(@PathVariable String email) {
+
+
+    @GetMapping("/get-by-email")
+    public ResponseEntity<ResponseData> getAccountByEmail(@RequestParam String email) {
         Account account = accountService.getAccountEmail(email);
         if (account != null) {
-            return ResponseEntity.ok(account);
+            return ResponseEntity.ok(new ResponseData("0", "Success", account));
         }
         return ResponseEntity.notFound().build();
     }
-    @GetMapping("/accountNumber/{accountNumber}")
-    public ResponseEntity<Account> getAccountByNumber(@PathVariable String accountNumber) {
+
+    @GetMapping("/get-by-accountNumber")
+    public ResponseEntity<ResponseData> getAccountByNumber(@RequestParam String accountNumber) {
         Account account = accountService.getAccountNumber(accountNumber);
         if (account != null) {
-            return ResponseEntity.ok(account);
+            return ResponseEntity.ok(new ResponseData("0", "Success", account));
         }
         return ResponseEntity.notFound().build();
     }

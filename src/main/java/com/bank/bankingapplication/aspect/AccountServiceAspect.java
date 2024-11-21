@@ -15,7 +15,7 @@ public class AccountServiceAspect {
     @Around("execution(* com.bank.bankingapplication.service.AccountService.*(..))")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         // Log method start
-        log.info("Starting method: " + joinPoint.getSignature());
+        log.info(":::::::::: Starting method: " + joinPoint.getSignature());
 
         long startTime = System.currentTimeMillis();
 
@@ -25,7 +25,7 @@ public class AccountServiceAspect {
         long timeTaken = System.currentTimeMillis() - startTime;
 
         // Log method end and time taken
-        log.info("Finished method: " + joinPoint.getSignature() + " in " + timeTaken + " ms");
+        log.info(" ::::::::: Finished method: " + joinPoint.getSignature() + " in " + timeTaken + " ms");
 
         return result; // Return the method result
     }
