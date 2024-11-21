@@ -2,6 +2,8 @@ package com.bank.bankingapplication.controller;
 
 import com.bank.bankingapplication.model.Account;
 import com.bank.bankingapplication.model.AccountDto;
+import com.bank.bankingapplication.model.AccountUpdateDto;
+import com.bank.bankingapplication.model.response.ResponseData;
 import com.bank.bankingapplication.service.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,55 +13,58 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/accounts")
+@RequestMapping("/api/account")
 public class AccountController {
     @Autowired
     private AccountService accountService;
+
     @PostMapping
-    public ResponseEntity<Account> createAccount(@RequestBody @Valid AccountDto account) {
-        Account createdAccount = accountService.createAccount(account);
-        return ResponseEntity.ok(createdAccount);
+    public ResponseEntity<ResponseData> createAccount(@RequestBody @Valid AccountDto account) {
+        return ResponseEntity.ok(accountService.createAccount(account));
     }
+
     @GetMapping("/{id}")
-    public ResponseEntity<Account> getAccountDetails(@PathVariable long id) {
+    public ResponseEntity<ResponseData> getAccountDetails(@PathVariable long id) {
         Optional<Account> accountDetails = accountService.getAccountDetails(id);
         if (accountDetails.isPresent()) {
-            return ResponseEntity.ok(accountDetails.get());
+            return ResponseEntity.ok(new ResponseData("0", "Success", accountDetails.get()));
         }
         return ResponseEntity.notFound().build();
     }
+
     @PutMapping("/{id}")
-    public ResponseEntity<Account> updateAccount(@PathVariable long id, @RequestBody AccountDto accountDto) {
-
-        // Set the account ID in the DTO
+    public ResponseEntity<ResponseData> updateAccount(@PathVariable long id, @RequestBody AccountUpdateDto accountDto) {
         accountDto.setAccountId(id);
-
-        // Call the service layer to update the account
         Account updatedAccount = accountService.updateAccount(accountDto);
-        return ResponseEntity.ok(updatedAccount);
+        return ResponseEntity.ok(new ResponseData("0", "Success", updatedAccount));
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAccount(@PathVariable long id) {
-        try {
+        Optional<Account> accountDetails = accountService.getAccountDetails(id);
+        if (accountDetails.isPresent()) {
             accountService.deleteAccount(id);
-            return ResponseEntity.noContent().build(); // Return 204 No Content if successful
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build(); // Return 404 Not Found if the account does not exist
+            return ResponseEntity.noContent().build();
+        }else{
+            return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping("/email/{email}")
-    public ResponseEntity<Account> getAccountByEmail(@PathVariable String email) {
+
+
+    @GetMapping("/get-by-email")
+    public ResponseEntity<ResponseData> getAccountByEmail(@RequestParam String email) {
         Account account = accountService.getAccountEmail(email);
         if (account != null) {
-            return ResponseEntity.ok(account);
+            return ResponseEntity.ok(new ResponseData("0", "Success", account));
         }
         return ResponseEntity.notFound().build();
     }
-    @GetMapping("/accountNumber/{accountNumber}")
-    public ResponseEntity<Account> getAccountByNumber(@PathVariable String accountNumber) {
+
+    @GetMapping("/get-by-accountNumber")
+    public ResponseEntity<ResponseData> getAccountByNumber(@RequestParam String accountNumber) {
         Account account = accountService.getAccountNumber(accountNumber);
         if (account != null) {
-            return ResponseEntity.ok(account);
+            return ResponseEntity.ok(new ResponseData("0", "Success", account));
         }
         return ResponseEntity.notFound().build();
     }

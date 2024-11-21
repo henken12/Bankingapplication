@@ -2,6 +2,7 @@ package com.bank.bankingapplication;
 
 import com.bank.bankingapplication.model.Account;
 import com.bank.bankingapplication.model.AccountDto;
+import com.bank.bankingapplication.model.response.ResponseData;
 import com.bank.bankingapplication.repository.AccountRepository;
 import com.bank.bankingapplication.service.AccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,11 +49,11 @@ class AccountServiceImplTest {
         when(accountRepository.save(any(Account.class))).thenReturn(account);
 
         // Act
-        Account createdAccount = accountService.createAccount(accountDto);
+        ResponseData createdAccount = accountService.createAccount(accountDto);
 
         // Assert
         assertNotNull(createdAccount);
-        assertEquals(accountDto.getEmail(), createdAccount.getEmail());
+        assertEquals("1", createdAccount.getCode());
         verify(accountRepository, times(1)).save(any(Account.class));
     }
 
@@ -81,7 +82,7 @@ class AccountServiceImplTest {
         existingAccount.setAccountId(1L);
         existingAccount.setAccountNumber("1234567890");
 
-        AccountDto accountDto = new AccountDto();
+        Account accountDto = new Account();
         accountDto.setAccountId(1L);
         accountDto.setAccountNumber("0987654321");
         accountDto.setBalance(2000.0);
